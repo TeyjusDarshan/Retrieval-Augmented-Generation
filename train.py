@@ -27,7 +27,7 @@ else:
 
 
 model_name = "answerdotai/ModernBERT-base"
-batch_size = 16
+batch_size = 8
 learning_rate = 5e-5
 num_epochs = 3
 train_set = 0.8

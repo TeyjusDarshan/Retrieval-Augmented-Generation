@@ -11,6 +11,7 @@ import torch
 import chromadb
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm  
+import argparse
 
 
 
@@ -25,9 +26,7 @@ else:
     device = torch.device("cpu")
     print("💻 Using CPU")
 
-model_name = "answerdotai/ModernBERT-base"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModel.from_pretrained(model_name).to(device)
+
 
 
 class WikiDataset(Dataset):
@@ -44,16 +43,55 @@ class WikiDataset(Dataset):
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description="Generate embeddings using a fine-tuned model and store them in ChromaDB.")
+    
+    parser.add_argument(
+        "--model_name", 
+        type=str, 
+        default="./best_model_checkpoint", 
+        help="Path to the saved model checkpoint or Hugging Face model ID."
+    )
+    parser.add_argument(
+        "--db_path", 
+        type=str, 
+        default="./RAG_db_2", 
+        help="Directory path where ChromaDB persistent data will be stored."
+    )
+    parser.add_argument(
+        "--collection_name", 
+        type=str, 
+        default="baseline_wiki_embeddings_2", 
+        help="Name of the collection inside ChromaDB."
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=16,
+        help="Batch size used for running model inference."
+    )
+
+    args = parser.parse_args()
+
+
+    model_name = args.model_name
+
+    print(f"Loading tokenizer and model from: {args.model_name}")
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name).to(device)
+
+    args = parser.parse_args()
     ds = load_dataset("rajpurkar/squad")
-    context = list(set(ds['train']['context']))
+    context = list(set(ds['train']['context'][:100]))
 
     print("unique context" , len(context))
     wikidataset = WikiDataset(context)
 
-    chroma_client = chromadb.PersistentClient(path='./RAG_db')
-    collection = chroma_client.get_or_create_collection(name='baseline_wiki_embeddings')
+    print(f"Initializing ChromaDB at '{args.db_path}' with collection '{args.collection_name}'")
+    chroma_client = chromadb.PersistentClient(path=args.db_path)
+    collection = chroma_client.get_or_create_collection(name=args.collection_name)
 
-    batch_size = 16
+    batch_size = args.batch_size
     data_loader = DataLoader(
         dataset=wikidataset, 
         batch_size=batch_size,
