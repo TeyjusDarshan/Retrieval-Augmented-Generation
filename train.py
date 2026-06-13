@@ -27,7 +27,7 @@ else:
 
 
 model_name = "answerdotai/ModernBERT-base"
-batch_size = 8
+batch_size = 16
 learning_rate = 5e-5
 num_epochs = 3
 train_set = 0.8
@@ -131,7 +131,12 @@ for epoch in range(num_epochs):
 
         optimizer.zero_grad()
 
-        logits = bi_encoder(c_batch, q_batch)
+        c_embeddings = bi_encoder(c_batch)
+        q_embeddings = bi_encoder(q_batch)
+
+        temperature = 0.05
+        similarity_matrix = q_embeddings @ c_embeddings.transpose(-1, -2) # Shape: [B, B]
+        logits = similarity_matrix / temperature
 
         targets = torch.arange(logits.size(0), dtype=torch.long, device=device)
 
@@ -147,9 +152,18 @@ for epoch in range(num_epochs):
             validation_loss = 0
             size = 0
             with torch.no_grad():
-                for q_batch, c_batch in tqdm(val_dataloader, desc="validating Batches", unit="batch"):
+                for q_val_batch, c_val_batch in tqdm(val_dataloader, desc="validating Batches", unit="batch"):
 
-                    logits = bi_encoder(c_batch, q_batch)
+                    c_embeddings = bi_encoder(c_val_batch)
+                    q_embeddings = bi_encoder(q_val_batch)
+
+                    temperature = 0.05
+                    similarity_matrix = q_embeddings @ c_embeddings.transpose(-1, -2) # Shape: [B, B]
+                    logits = similarity_matrix / temperature
+
+                    targets = torch.arange(logits.size(0), dtype=torch.long, device=device)
+
+                    loss = criterion(logits, targets)
 
                     targets = torch.arange(logits.size(0), dtype=torch.long, device=device)
 

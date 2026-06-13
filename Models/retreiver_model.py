@@ -13,23 +13,14 @@ class SymmetricBiEncoder(nn.Module):
         super().__init__()
         self.model = AutoModel.from_pretrained(model_name).to(device)
 
-    def forward(self, c_input, q_input):
-        q_outputs = self.model(**q_input)
-        c_outputs = self.model(**c_input)
+    def forward(self, input):
+        outputs = self.model(**input)
 
-        q_embeddings = self.mean_pooling(q_outputs, q_input['attention_mask'])
-        c_embeddings = self.mean_pooling(c_outputs, c_input['attention_mask'])
+        embeddings = self.mean_pooling(outputs, input['attention_mask'])
 
-        q_embeddings = torch.nn.functional.normalize(q_embeddings, p=2, dim=-1)
-        c_embeddings = torch.nn.functional.normalize(c_embeddings, p=2, dim=-1)
+        embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=-1)
 
-        similarity_matrix = q_embeddings @ c_embeddings.transpose(-1, -2)
-
-        temperature = 0.05 
-        scaled_similarity = similarity_matrix / temperature
-
-        
-        return scaled_similarity # shape [B, num questions, num context]
+        return embeddings
     
 
     def mean_pooling(self, model_output, attention_mask):
