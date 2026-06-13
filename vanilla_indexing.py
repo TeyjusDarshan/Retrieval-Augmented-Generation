@@ -45,7 +45,7 @@ class WikiDataset(Dataset):
 
 if __name__ == '__main__':
     ds = load_dataset("rajpurkar/squad")
-    context = list(set(ds['train']['context'][:50]))
+    context = list(set(ds['train']['context']))
 
     print("unique context" , len(context))
     wikidataset = WikiDataset(context)
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     chroma_client = chromadb.PersistentClient(path='./RAG_db')
     collection = chroma_client.get_or_create_collection(name='baseline_wiki_embeddings')
 
-    batch_size = 8
+    batch_size = 16
     data_loader = DataLoader(
         dataset=wikidataset, 
         batch_size=batch_size,
