@@ -169,7 +169,7 @@ for epoch in range(num_epochs):
 
                     loss = criterion(logits, targets)
 
-                    validation_loss += loss.item() * logits.size(0)
+                    validation_loss += loss.item() * int(logits.size(0))
                     size += logits.size(0)
                 
                 avg_val_loss = validation_loss/size
