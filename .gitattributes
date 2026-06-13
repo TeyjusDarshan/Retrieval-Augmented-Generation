@@ -1,3 +1,4 @@
+RAG_db filter=lfs diff=lfs merge=lfs -text
 ./RAG_db filter=lfs diff=lfs merge=lfs -text
 RAG_db/chroma.sqlite3 filter=lfs diff=lfs merge=lfs -text
 RAG_db/**/data_level0.bin filter=lfs diff=lfs merge=lfs -text
