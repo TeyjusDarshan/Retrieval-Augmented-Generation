@@ -8,7 +8,7 @@ from transformers import AutoModel
 import torch 
 from torch import nn
 
-class SymmetricBiEncoder(nn.Module):
+class DocumentEncoder(nn.Module):
     def __init__(self, model_name, device):
         super().__init__()
         self.model = AutoModel.from_pretrained(model_name).to(device)

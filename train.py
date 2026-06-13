@@ -5,7 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 from datasets import load_dataset
 from torch import nn
 from transformers import get_linear_schedule_with_warmup
-from Models.retreiver_model import SymmetricBiEncoder
+from Models.retreiver_model import DocumentEncoder
 import os
 
 
@@ -103,7 +103,7 @@ val_ds = train_split.select(range(train_end_idx, ds_size))
 train_dataloader = DataLoader(WikiDataset(train_ds), batch_size=batch_size, collate_fn=collate_fn, shuffle=True)
 val_dataloader = DataLoader(WikiDataset(val_ds), batch_size=batch_size, collate_fn=collate_fn, shuffle=True)
 
-bi_encoder = SymmetricBiEncoder(model_name, device)
+bi_encoder = DocumentEncoder(model_name, device)
 
 optimizer = torch.optim.AdamW(
     bi_encoder.parameters(), 
