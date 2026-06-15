@@ -43,7 +43,7 @@ if __name__ == "__main__":
         print("💻 Using CPU")
 
     
-    model_name = "./model_weights/best_model_checkpoint"
+    model_name = "Teyjus/modernbert-squad-finetuned"
     # model_name = 'answerdotai/ModernBERT-base'
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name).to(device)
