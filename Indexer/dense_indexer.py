@@ -130,7 +130,7 @@ if __name__ == '__main__':
             batch_metadatas = [{"source": "squad_dataset"} for _ in batch_contexts]
 
             collection.add(
-                embeddings=normalized_embeddings,
+                embeddings=embeddings_list,
                 documents=batch_contexts,
                 ids=batch_ids,
                 metadatas=batch_metadatas
