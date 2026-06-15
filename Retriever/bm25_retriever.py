@@ -1,6 +1,13 @@
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import bm25s
 import Stemmer
 from retriever import Retriever
+
+
 
 
 class BM25Retriever(Retriever):

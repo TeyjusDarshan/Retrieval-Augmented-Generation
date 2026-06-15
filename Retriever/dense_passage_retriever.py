@@ -8,6 +8,7 @@ from retriever import Retriever
 from transformers import AutoModel, AutoTokenizer
 import torch
 import chromadb
+import torch.nn.functional as F
 
 
 class DensePassageRetreiver(Retriever):
@@ -40,8 +41,10 @@ class DensePassageRetreiver(Retriever):
             sum_embeddings = torch.sum(last_hidden * attention_mask, dim=1)
             sum_mask = torch.clamp(attention_mask.sum(dim=1), min=1e-9)
             mean_pooled = sum_embeddings / sum_mask
+
+            normalized_embeddings = F.normalize(mean_pooled, p=2, dim=1)
             
-            embeddings_list = mean_pooled.cpu().tolist()
+            embeddings_list = normalized_embeddings.cpu().tolist()
 
             results = self.collection.query(
                 query_embeddings=embeddings_list,
