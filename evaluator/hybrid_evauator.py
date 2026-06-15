@@ -18,6 +18,7 @@ from Metrics.metrics_calculator import MetricsCalculator
 from tqdm import tqdm
 import math
 from Retriever.hybrid_retreiver import HybridRetreiver
+import argparse
 
 
 if __name__ == "__main__":
@@ -30,6 +31,15 @@ if __name__ == "__main__":
     else:
         device = torch.device("cpu")
         print("💻 Using CPU")
+
+    parser = argparse.ArgumentParser(description="Run validation on the retriever.")
+    parser.add_argument(
+        "--recall_at", 
+        type=int, 
+        required=True, 
+        help="The 'K' value for calculating Recall@K (e.g., 2, 3, 5, 15)"
+    )
+    args = parser.parse_args()
 
     
     model_name = "./model_weights/best_model_checkpoint"
@@ -51,7 +61,7 @@ if __name__ == "__main__":
                       total = total_batches, 
                       desc = 'Evaluating Retrieval'):
         queries = batch["question"]
-        results = hybridRetreiver.retrieve(queries, 10)
+        results = hybridRetreiver.retrieve(queries, args.recall_at)
         for i in range(len(queries)):
             recall_k += metricsCalculator.RecallAtK(results[i], batch["context"][i])
 

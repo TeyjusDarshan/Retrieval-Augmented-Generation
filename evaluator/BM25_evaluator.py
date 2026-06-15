@@ -10,9 +10,21 @@ from tqdm import tqdm
 import math
 from Retriever.bm25_retriever import BM25Retriever
 from Metrics.metrics_calculator import MetricsCalculator
+import argparse
 
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Run validation on the retriever.")
+    parser.add_argument(
+        "--recall_at", 
+        type=int, 
+        required=True, 
+        help="The 'K' value for calculating Recall@K (e.g., 2, 3, 5, 15)"
+    )
+    args = parser.parse_args()
+
+
     ds = load_dataset("rajpurkar/squad")['validation']
 
     batch_size = 4
@@ -20,7 +32,6 @@ if __name__ == "__main__":
 
     retreiver = BM25Retriever("./indices/bm25_wikipedia_index")
     metricsCalculator = MetricsCalculator() 
-    k = 10
 
     recall_k = 0
 
@@ -30,7 +41,7 @@ if __name__ == "__main__":
         
         queries = batch["question"]
 
-        results, scores = retreiver.retrieve(queries, k)
+        results, scores = retreiver.retrieve(queries, args.recall_at)
                 
         
         for i in range(len(queries)):

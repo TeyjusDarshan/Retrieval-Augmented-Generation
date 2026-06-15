@@ -18,9 +18,20 @@ from Metrics.metrics_calculator import MetricsCalculator
 import numpy as np
 from tqdm import tqdm
 import math
+import argparse  # Added for CLI argument parsing
 
 
 if __name__ == "__main__":
+    # Setup command line argument parsing
+    parser = argparse.ArgumentParser(description="Run validation on the retriever.")
+    parser.add_argument(
+        "--recall_at", 
+        type=int, 
+        required=True, 
+        help="The 'K' value for calculating Recall@K (e.g., 2, 3, 5, 15)"
+    )
+    args = parser.parse_args()
+
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print(f"🚀 Using NVIDIA GPU: {torch.cuda.get_device_name(0)}")
@@ -52,11 +63,12 @@ if __name__ == "__main__":
         queries = batch["question"]
 
     # queries = ["To whom did the Virgin Mary allegedly appear in 1858 in Lourdes France?"]
-        docs = retreiver.retrieve(queries, 3)['documents']
+        # Passed args.recall_at dynamically to the retriever instead of the hardcoded 3
+        docs = retreiver.retrieve(queries, args.recall_at)['documents']
         
         for i in range(len(queries)):
             recall_k += metricsCalculator.RecallAtK(docs[i], batch["context"][i])
     
     recall_k_avg = float(recall_k/len(ds))
 
-    print("Recall At K: ", recall_k_avg)
+    print(f"Recall At {args.recall_at}: ", recall_k_avg)
