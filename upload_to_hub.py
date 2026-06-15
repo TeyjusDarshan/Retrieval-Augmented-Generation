@@ -3,7 +3,7 @@ from huggingface_hub import HfApi
 api = HfApi()
 
 # Your Hugging Face repository name
-repo_id = "tdTeyjus/modernbert-squad-finetuned"
+repo_id = "Teyjus/modernbert-squad-finetuned"
 
 # Local folder path containing your model weights and configs
 local_folder = "./model_weights/best_model_checkpoint"
