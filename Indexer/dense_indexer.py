@@ -12,6 +12,8 @@ import chromadb
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm  
 import argparse
+import torch.nn.functional as F
+
 
 
 
@@ -67,12 +69,11 @@ if __name__ == '__main__':
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=32,
+        default=4,
         help="Batch size used for running model inference."
     )
 
     args = parser.parse_args()
-
 
     model_name = args.model_name
 
@@ -80,7 +81,6 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name).to(device)
 
-    args = parser.parse_args()
     ds = load_dataset("rajpurkar/squad")
     context = list(set(ds['validation']['context']))
 
@@ -119,8 +119,9 @@ if __name__ == '__main__':
             sum_embeddings = torch.sum(last_hidden * attention_mask, dim=1)
             sum_mask = torch.clamp(attention_mask.sum(dim=1), min=1e-9)
             mean_pooled = sum_embeddings / sum_mask
-            
-            embeddings_list = mean_pooled.cpu().tolist()
+
+            normalized_docs = torch.nn.functional.normalize(mean_pooled, p=2, dim=1)
+            embeddings_list = normalized_docs.cpu().tolist()
 
             start_idx = batch_idx * batch_size
             end_idx = start_idx + batch_size
@@ -129,7 +130,7 @@ if __name__ == '__main__':
             batch_metadatas = [{"source": "squad_dataset"} for _ in batch_contexts]
 
             collection.add(
-                embeddings=embeddings_list,
+                embeddings=normalized_embeddings,
                 documents=batch_contexts,
                 ids=batch_ids,
                 metadatas=batch_metadatas
