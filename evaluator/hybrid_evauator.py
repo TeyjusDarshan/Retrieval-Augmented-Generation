@@ -1,8 +1,9 @@
 '''
-    Recall@10: 0.9540208136234626
-    Recall@3: 0.8946073793755913
-    Recall@2: 0.8583727530747398 
-    Recall@1: 0.7999053926206244
+    Recall@15: 0.9718070009460738
+    Recall@10: 0.9604541154210028
+    Recall@5: 0.9285714285714286
+    Recall@3: 0.8990539262062441
+    Recall@1: 0.8076631977294229
 
 '''
 
@@ -24,13 +25,13 @@ import argparse
 if __name__ == "__main__":
     if torch.cuda.is_available():
         device = torch.device("cuda")
-        print(f"🚀 Using NVIDIA GPU: {torch.cuda.get_device_name(0)}")
+        print(f"Using NVIDIA GPU: {torch.cuda.get_device_name(0)}")
     elif torch.backends.mps.is_available():
         device = torch.device("mps")
-        print("🍏 Using Apple Silicon GPU (MPS)")
+        print("Using Apple Silicon GPU (MPS)")
     else:
         device = torch.device("cpu")
-        print("💻 Using CPU")
+        print("Using CPU")
 
     parser = argparse.ArgumentParser(description="Run validation on the retriever.")
     parser.add_argument(
